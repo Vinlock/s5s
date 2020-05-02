@@ -24,3 +24,8 @@ $ s5s gcp \
     -s "mysqlpassword=app-mysql-password" \
     -o mysql-creds | kubectl apply --context k8s-cluster -n app-namespace -f -
 ```
+
+### Download
+- Linux (https://s5s.sfo2.digitaloceanspaces.com/linux-amd64/s5s)
+- Windows (https://s5s.sfo2.digitaloceanspaces.com/windows-amd64/s5s.exe)
+- MacOS (https://s5s.sfo2.digitaloceanspaces.com/macos-amd64/s5s)
