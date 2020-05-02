@@ -77,25 +77,45 @@ var gcpCommand = &cobra.Command{
 		}
 
 		k8sSecrets := make(map[string]string)
+
+		channel := make(chan func() (string, string))
+
 		for _, secret := range secrets {
-			secretKV := strings.Split(secret, "=")
-			if len(secretKV) != 2 {
-				log.Fatal("Secret error: Secret must be in the \"k8sKey=gcpKey\" format")
-			}
+			go func(secret string) {
+				secretKV := strings.Split(secret, "=")
+				if len(secretKV) != 2 {
+					log.Fatal("Secret error: Secret must be in the \"k8sKey=gcpKey\" format")
+				}
 
-			k8sSecretKey := secretKV[0]
-			gcpSecretKey := secretKV[1]
-			request := secretmanager.AccessSecretVersionRequest{
-				Name:                 "projects/" + project + "/secrets/" + gcpSecretKey + "/versions/" + version,
-				XXX_NoUnkeyedLiteral: struct{}{},
-				XXX_unrecognized:     nil,
-				XXX_sizecache:        0,
-			}
+				k8sSecretKey := secretKV[0]
+				gcpSecretKey := secretKV[1]
+				request := secretmanager.AccessSecretVersionRequest{
+					Name:                 "projects/" + project + "/secrets/" + gcpSecretKey + "/versions/" + version,
+					XXX_NoUnkeyedLiteral: struct{}{},
+					XXX_unrecognized:     nil,
+					XXX_sizecache:        0,
+				}
 
-			if response, responseError := client.AccessSecretVersion(ctx, &request); responseError != nil {
-				log.Fatal("Response error: " + responseError.Error())
-			} else {
-				k8sSecrets[k8sSecretKey] = base64.StdEncoding.EncodeToString(response.Payload.Data)
+				if response, responseError := client.AccessSecretVersion(ctx, &request); responseError != nil {
+					log.Fatal("Response error: " + responseError.Error())
+				} else {
+					returnValues := func(c chan func() (string, string)) {
+						c <- func() (string, string) {
+							return k8sSecretKey, base64.StdEncoding.EncodeToString(response.Payload.Data)
+						}
+					}
+					go returnValues(channel)
+				}
+			}(secret)
+		}
+
+		secretsFound := 0
+		for v := range channel {
+			secretsFound++
+			k8sKey, secretValue := v()
+			k8sSecrets[k8sKey] = secretValue
+			if secretsFound == len(secrets) {
+				close(channel)
 			}
 		}
 
