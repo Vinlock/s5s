@@ -3,7 +3,7 @@
 s5s is a tool to download and apply secrets from cloud Secret Managers
 
 ## Supported Secret Managers
-- Google Cloud Secret Manager [(link)](https://cloud.google.com/secret-manager)
+- [#google-cloud-secret-manager](Google Cloud Secret Manager) [(link)](https://cloud.google.com/secret-manager)
 
 ### Google Cloud Secret Manager
 | Flag                    | Description                                                       | Required | Default Value |
