@@ -6,15 +6,13 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "s5s",
+	Use:   "s5s",
 	Short: "Secrets Manager Bridge for Kubernetes",
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringP("namespace", "n", "", "k8s namespace (required)")
-	if err := rootCmd.MarkPersistentFlagRequired("namespace"); err != nil {
-		log.Fatal(err)
-	}
+	rootCmd.PersistentFlags().StringP("output-secret", "o", "", "k8s secret name (required)")
+	_ = rootCmd.MarkPersistentFlagRequired("output-secret")
 }
 
 func Execute() {
@@ -22,4 +20,3 @@ func Execute() {
 		log.Fatal(err)
 	}
 }
-
