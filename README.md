@@ -17,5 +17,5 @@ s5s is a tool to download and apply secrets from cloud Secret Managers
 
 #### Example:
 ```bash
-$ s5s gcp -p graphite-pad-275620 -f secret.json -s "mysqlusername=app-mysql-username" -s "mysqlpassword=app-mysql-password" -o mysql-creds
+$ s5s gcp -p graphite-pad-275620 -f secret.json -s "mysqlusername=app-mysql-username" -s "mysqlpassword=app-mysql-password" -o mysql-creds | kubectl apply --context k8s-cluster -n app-namespace -f -
 ```
