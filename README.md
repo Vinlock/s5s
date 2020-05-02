@@ -18,7 +18,7 @@ s5s is a tool to download and apply secrets from cloud Secret Managers
 #### Example:
 ```bash
 $ s5s gcp \
-    -p graphite-pad-275620 \
+    -p gcp-project-id \
     -f secret.json \
     -s "mysqlusername=app-mysql-username" \
     -s "mysqlpassword=app-mysql-password" \
