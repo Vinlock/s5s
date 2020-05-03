@@ -17,9 +17,9 @@ jobs:
         type: string
         default: s5s
     environment:
-      - GOOS: << parameters.os >>
-      - GOARCH: << parameters.arch >>
-      - BUILD_FILENAME: << parameters.filename >>
+      - GOOS: << parameters.build-os >>
+      - GOARCH: << parameters.build-arch >>
+      - BUILD_FILENAME: << parameters.build-filename >>
     steps:
       - checkout
       - run:
@@ -44,8 +44,8 @@ jobs:
         type: string
         default: s5s
     environment:
-      - BUILD_DISTRO: << parameters.os >>
-      - BUILD_FILENAME: << parameters.filename >>
+      - BUILD_DISTRO: << parameters.build-os >>
+      - BUILD_FILENAME: << parameters.build-filename >>
     steps:
       - attach_workspace:
           at: /tmp
