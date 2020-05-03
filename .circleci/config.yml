@@ -2,9 +2,9 @@ version: 2
 
 jobs:
   create-binary: &create-binary
-    working_directory: /go/src/s5s
+    working_directory: ~/go/src/s5s
     docker:
-      - image: circleci/golang:1.8
+      - image: cimg/go:1.13
     steps:
       - checkout
       - run:
