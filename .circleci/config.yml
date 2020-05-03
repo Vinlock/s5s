@@ -1,0 +1,51 @@
+version: 2
+
+jobs:
+  create-binary: &create-binary
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - checkout
+      - go build .
+  create-windows-binary:
+    environment:
+      - GOOS: windows
+      - GOARCH: amd64
+    <<: *create-binary
+  create-linux-binary:
+    environment:
+      - GOOS: linux
+      - GOARCH: amd64
+    <<: *create-binary
+  create-macos-binary:
+    environment:
+      - GOOS: macos
+      - GOARCH: amd64
+  publish-github-release:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete $CIRCLE_SHA1 ./artifacts/
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete latest ./artifacts/
+
+workflows:
+  version: 2
+  build-and-publish:
+    jobs:
+      - create-windows-binary:
+      - create-linux-binary:
+      - create-macos-binary:
+      - publish-github-release:
+          context: github-publishing
+          requires:
+            - create-windows-binary
+            - create-linux-binary
+            - create-macos-binary
+          filters:
+            branches:
+              only:
+                - master
