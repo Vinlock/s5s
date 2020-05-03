@@ -2,6 +2,7 @@ version: 2
 
 jobs:
   create-binary: &create-binary
+    working_directory: /go/src
     docker:
       - image: circleci/golang:1.8
     steps:
