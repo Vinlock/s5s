@@ -61,48 +61,45 @@ jobs:
 workflows:
   version: 2
   publish-windows-binary:
-    triggers:
-      - filters:
-          branches:
-            only:
-              - master
     jobs:
       - create-binary:
           os: windows
           arch: amd64
           filename: s5s.exe
+          filters:
+            branches:
+              only:
+                - master
       - publish-release:
           os: windows
           filename: s5s.exe
           requires:
             - create-binary
   publish-linux-binary:
-    triggers:
-      - filters:
-          branches:
-            only:
-              - master
     jobs:
       - create-binary:
           os: linux
           arch: amd64
           filename: s5s
+          filters:
+            branches:
+              only:
+                - master
       - publish-release:
           os: linux
           filename: s5s
           requires:
             - create-binary
   publish-darwin-binary:
-    triggers:
-      - filters:
-          branches:
-            only:
-              - master
     jobs:
       - create-binary:
           os: darwin
           arch: amd64
           filename: s5s
+          filters:
+            branches:
+              only:
+                - master
       - publish-release:
           os: darwin
           filename: s5s
