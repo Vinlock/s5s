@@ -6,13 +6,13 @@ jobs:
     docker:
       - image: cimg/go:1.13
     parameters:
-      os:
+      build-os:
         description: Operating System
         type: string
-      arch:
+      build-arch:
         description: Architecture
         type: string
-      filename:
+      build-filename:
         description: Output Filename
         type: string
         default: s5s
@@ -36,10 +36,10 @@ jobs:
     docker:
       - image: cimg/go:1.13
     parameters:
-      os:
+      build-os:
         description: Operating System
         type: string
-      filename:
+      build-filename:
         description: Output Filename
         type: string
         default: s5s
@@ -63,12 +63,12 @@ workflows:
   publish-windows-binary:
     jobs:
       - create-binary:
-          os: windows
-          arch: amd64
-          filename: s5s.exe
+          build-os: windows
+          build-arch: amd64
+          build-filename: s5s.exe
       - publish-release:
-          os: windows
-          filename: s5s.exe
+          build-os: windows
+          build-filename: s5s.exe
           requires:
             - create-binary
           filters:
@@ -78,12 +78,12 @@ workflows:
   publish-linux-binary:
     jobs:
       - create-binary:
-          os: linux
-          arch: amd64
-          filename: s5s
+          build-os: linux
+          build-arch: amd64
+          build-filename: s5s
       - publish-release:
-          os: linux
-          filename: s5s
+          build-os: linux
+          build-filename: s5s
           requires:
             - create-binary
           filters:
@@ -93,12 +93,12 @@ workflows:
   publish-darwin-binary:
     jobs:
       - create-binary:
-          os: darwin
-          arch: amd64
-          filename: s5s
+          build-os: darwin
+          build-arch: amd64
+          build-filename: s5s
       - publish-release:
-          os: darwin
-          filename: s5s
+          build-os: darwin
+          build-filename: s5s
           requires:
             - create-binary
           filters:
