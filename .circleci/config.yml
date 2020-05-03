@@ -16,7 +16,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp/artifacts
           paths:
-            - *
+            - $GOOS/*
   create-windows-binary:
     <<: *create-binary
     environment:
