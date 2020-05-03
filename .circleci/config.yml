@@ -55,8 +55,8 @@ jobs:
       - run:
           name: Publish to GitHub
           command: |
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $BUILD_DISTRO-$CIRCLE_SHA1 /tmp/artifacts/$BUILD_DISTRO/$BUILD_FILENAME
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -delete $BUILD_DISTRO-latest /tmp/artifacts/$BUILD_DISTRO/$BUILD_FILENAME
+            ghr -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${BUILD_DISTRO}-${CIRCLE_SHA1} /tmp/artifacts/${BUILD_DISTRO}/${BUILD_FILENAME}
+            ghr -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${BUILD_DISTRO}-latest /tmp/artifacts/${BUILD_DISTRO}/${BUILD_FILENAME}
 
 workflows:
   version: 2
