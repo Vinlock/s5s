@@ -66,9 +66,11 @@ workflows:
           build-os: windows
           build-arch: amd64
           build-filename: s5s.exe
+          context: github-publishing
       - publish-release:
           build-os: windows
           build-filename: s5s.exe
+          context: github-publishing
           requires:
             - create-binary
           filters:
