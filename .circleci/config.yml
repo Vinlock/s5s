@@ -15,6 +15,8 @@ jobs:
           command: go build -o /tmp/artifacts/$GOOS/s5s .
       - persist_to_workspace:
           root: /tmp/artifacts
+          paths:
+            - *
   create-windows-binary:
     <<: *create-binary
     environment:
