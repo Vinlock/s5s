@@ -6,7 +6,13 @@ jobs:
       - image: circleci/golang:1.8
     steps:
       - checkout
-      - go build .
+      - run:
+          name: "Build"
+          command: go build . -o /tmp/artifacts/$GOOS/s5s
+      - persist_to_workspace:
+          root: /tmp/artifacts
+          paths:
+            - $GOOS
   create-windows-binary:
     <<: *create-binary
     environment:
@@ -26,12 +32,18 @@ jobs:
     docker:
       - image: circleci/golang:1.8
     steps:
+      - attach_workspace:
+          at: /tmp/artifacts
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete $CIRCLE_SHA1 ./artifacts/
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete latest ./artifacts/
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete windows-$CIRCLE_SHA1 /tmp/artifacts/windows/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete windows-latest /tmp/artifacts/windows/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-$CIRCLE_SHA1 /tmp/artifacts/linux/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-latest /tmp/artifacts/linux/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete macos-$CIRCLE_SHA1 /tmp/artifacts/macos/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete macos-latest /tmp/artifacts/macos/s5s
 
 workflows:
   version: 2
