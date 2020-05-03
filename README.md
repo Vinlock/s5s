@@ -25,7 +25,7 @@ $ s5s gcp \
     -o mysql-creds | kubectl apply --context k8s-cluster -n app-namespace -f -
 ```
 
-### Download
-- Linux (https://s5s.sfo2.digitaloceanspaces.com/linux-amd64/s5s)
-- Windows (https://s5s.sfo2.digitaloceanspaces.com/windows-amd64/s5s.exe)
-- MacOS (https://s5s.sfo2.digitaloceanspaces.com/macos-amd64/s5s)
+### Download Latest
+- Linux (https://github.com/Vinlock/s5s/releases/download/linux-latest/s5s)
+- Windows (https://github.com/Vinlock/s5s/releases/download/windows-latest/s5s.exe)
+- MacOS (https://github.com/Vinlock/s5s/releases/download/darwin-latest/s5s)
