@@ -83,9 +83,11 @@ workflows:
           build-os: linux
           build-arch: amd64
           build-filename: s5s
+          context: github-publishing
       - publish-release:
           build-os: linux
           build-filename: s5s
+          context: github-publishing
           requires:
             - create-binary
           filters:
@@ -98,9 +100,11 @@ workflows:
           build-os: darwin
           build-arch: amd64
           build-filename: s5s
+          context: github-publishing
       - publish-release:
           build-os: darwin
           build-filename: s5s
+          context: github-publishing
           requires:
             - create-binary
           filters:
