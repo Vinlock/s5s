@@ -36,9 +36,9 @@ workflows:
   version: 2
   build-and-publish:
     jobs:
-      - create-windows-binary:
-      - create-linux-binary:
-      - create-macos-binary:
+      - create-windows-binary
+      - create-linux-binary
+      - create-macos-binary
       - publish-github-release:
           context: github-publishing
           requires:
