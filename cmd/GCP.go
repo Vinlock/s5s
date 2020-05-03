@@ -89,11 +89,9 @@ var gcpCommand = &cobra.Command{
 
 				k8sSecretKey := secretKV[0]
 				gcpSecretKey := secretKV[1]
+				secretName := "projects/" + project + "/secrets/" + gcpSecretKey + "/versions/" + version
 				request := secretmanager.AccessSecretVersionRequest{
-					Name:                 "projects/" + project + "/secrets/" + gcpSecretKey + "/versions/" + version,
-					XXX_NoUnkeyedLiteral: struct{}{},
-					XXX_unrecognized:     nil,
-					XXX_sizecache:        0,
+					Name: secretName,
 				}
 
 				if response, responseError := client.AccessSecretVersion(ctx, &request); responseError != nil {
