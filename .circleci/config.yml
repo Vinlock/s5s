@@ -8,16 +8,17 @@ jobs:
       - checkout
       - go build .
   create-windows-binary:
+    <<: *create-binary
     environment:
       - GOOS: windows
       - GOARCH: amd64
-    <<: *create-binary
   create-linux-binary:
+    <<: *create-binary
     environment:
       - GOOS: linux
       - GOARCH: amd64
-    <<: *create-binary
   create-macos-binary:
+    <<: *create-binary
     environment:
       - GOOS: macos
       - GOARCH: amd64
