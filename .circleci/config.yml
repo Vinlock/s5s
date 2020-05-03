@@ -8,7 +8,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Build"
+          name: Download Dependencies
+          command: go get
+      - run:
+          name: Build Binary
           command: go build . -o /tmp/artifacts/$GOOS/s5s
       - persist_to_workspace:
           root: /tmp/artifacts
