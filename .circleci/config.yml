@@ -30,7 +30,7 @@ jobs:
   create-macos-binary:
     <<: *create-binary
     environment:
-      - GOOS: macos
+      - GOOS: darwin
       - GOARCH: amd64
   publish-github-release:
     docker:
@@ -46,8 +46,8 @@ jobs:
             ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete windows-latest /tmp/artifacts/windows/s5s
             ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-$CIRCLE_SHA1 /tmp/artifacts/linux/s5s
             ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-latest /tmp/artifacts/linux/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete macos-$CIRCLE_SHA1 /tmp/artifacts/macos/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete macos-latest /tmp/artifacts/macos/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete darwin-$CIRCLE_SHA1 /tmp/artifacts/darwin/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete darwin-latest /tmp/artifacts/darwin/s5s
 
 workflows:
   version: 2
