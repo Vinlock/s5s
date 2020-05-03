@@ -1,10 +1,25 @@
 version: 2
 
 jobs:
-  create-binary: &create-binary
+  create-binary:
     working_directory: ~/go/src/s5s
     docker:
       - image: cimg/go:1.13
+    parameters:
+      os:
+        description: Operating System
+        type: string
+      arch:
+        description: Architecture
+        type: string
+      filename:
+        description: Output Filename
+        type: string
+        default: s5s
+    environment:
+      - GOOS: << parameters.os >>
+      - GOARCH: << parameters.arch >>
+      - BUILD_FILENAME: << parameters.filename >>
     steps:
       - checkout
       - run:
@@ -12,57 +27,84 @@ jobs:
           command: go get
       - run:
           name: Build Binary
-          command: go build -o /tmp/artifacts/$GOOS/s5s .
+          command: go build -o /tmp/artifacts/$GOOS/$BUILD_FILENAME .
       - persist_to_workspace:
           root: /tmp
           paths:
             - artifacts
-  create-windows-binary:
-    <<: *create-binary
-    environment:
-      - GOOS: windows
-      - GOARCH: amd64
-  create-linux-binary:
-    <<: *create-binary
-    environment:
-      - GOOS: linux
-      - GOARCH: amd64
-  create-macos-binary:
-    <<: *create-binary
-    environment:
-      - GOOS: darwin
-      - GOARCH: amd64
-  publish-github-release:
+  publish-release:
     docker:
-      - image: circleci/golang:1.8
+      - image: cimg/go:1.13
+    parameters:
+      os:
+        description: Operating System
+        type: string
+      filename:
+        description: Output Filename
+        type: string
+        default: s5s
+    environment:
+      - BUILD_DISTRO: << parameters.os >>
+      - BUILD_FILENAME: << parameters.filename >>
     steps:
       - attach_workspace:
-          at: /tmp/artifacts
+          at: /tmp
       - run:
-          name: "Publish Release on GitHub"
+          name: Install GHR
+          command: go get -u github.com/tcnksm/ghr
+      - run:
+          name: Publish to GitHub
           command: |
-            go get github.com/tcnksm/ghr
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete windows-$CIRCLE_SHA1 /tmp/artifacts/windows/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete windows-latest /tmp/artifacts/windows/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-$CIRCLE_SHA1 /tmp/artifacts/linux/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete linux-latest /tmp/artifacts/linux/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete darwin-$CIRCLE_SHA1 /tmp/artifacts/darwin/s5s
-            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete darwin-latest /tmp/artifacts/darwin/s5s
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete $BUILD_DISTRO-$CIRCLE_SHA1 /tmp/artifacts/$BUILD_DISTRO/$BUILD_FILENAME
+            ghr -t $GITHUB_TOKEN -U $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPORNAME -c $CIRCLE_SHA1 -delete $BUILD_DISTRO-latest /tmp/artifacts/$BUILD_DISTRO/$BUILD_FILENAME
 
 workflows:
   version: 2
-  build-and-publish:
+  publish-windows-binary:
+    triggers:
+      - filters:
+          branches:
+            only:
+              - master
     jobs:
-      - create-windows-binary
-      - create-linux-binary
-      - create-macos-binary
-      - publish-github-release:
-          context: github-publishing
+      - create-binary:
+          os: windows
+          arch: amd64
+          filename: s5s.exe
+      - publish-release:
+          os: windows
+          filename: s5s.exe
           requires:
-            - create-windows-binary
-            - create-linux-binary
-            - create-macos-binary
-          filters:
-            branches:
-              only:
-                - master
+            - create-binary
+  publish-linux-binary:
+    triggers:
+      - filters:
+          branches:
+            only:
+              - master
+    jobs:
+      - create-binary:
+          os: linux
+          arch: amd64
+          filename: s5s
+      - publish-release:
+          os: linux
+          filename: s5s
+          requires:
+            - create-binary
+  publish-darwin-binary:
+    triggers:
+      - filters:
+          branches:
+            only:
+              - master
+    jobs:
+      - create-binary:
+          os: darwin
+          arch: amd64
+          filename: s5s
+      - publish-release:
+          os: darwin
+          filename: s5s
+          requires:
+            - create-binary
