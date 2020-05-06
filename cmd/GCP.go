@@ -107,15 +107,11 @@ var gcpCommand = &cobra.Command{
 			}(secret)
 		}
 
-		secretsFound := 0
 		for v := range channel {
-			secretsFound++
 			k8sKey, secretValue := v()
 			k8sSecrets[k8sKey] = secretValue
-			if secretsFound == len(secrets) {
-				close(channel)
-			}
 		}
+		close(channel)
 
 		k8sSecret, err := helpers.GenerateJSONSecret(k8sSecretName, k8sSecrets)
 		if err != nil {
