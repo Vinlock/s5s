@@ -12,6 +12,7 @@ import (
 	"os"
 	"s5s/helpers"
 	"strings"
+	"sync"
 )
 
 func init() {
@@ -28,6 +29,11 @@ func init() {
 	_ = gcpCommand.MarkFlagRequired("secret")
 
 	rootCmd.AddCommand(gcpCommand)
+}
+
+type returnData struct {
+	K8sSecretKey string
+	EncodedData  string
 }
 
 var gcpCommand = &cobra.Command{
@@ -78,10 +84,13 @@ var gcpCommand = &cobra.Command{
 
 		k8sSecrets := make(map[string]string)
 
-		channel := make(chan func() (string, string))
+		ch := make(chan returnData)
+		var wg sync.WaitGroup
 
 		for _, secret := range secrets {
+			wg.Add(1)
 			go func(secret string) {
+				defer wg.Done()
 				secretKV := strings.Split(secret, "=")
 				if len(secretKV) != 2 {
 					log.Fatal("Secret error: Secret must be in the \"k8sKey=gcpKey\" format")
@@ -97,27 +106,28 @@ var gcpCommand = &cobra.Command{
 				if response, responseError := client.AccessSecretVersion(ctx, &request); responseError != nil {
 					log.Fatal("Response error: " + responseError.Error())
 				} else {
-					returnValues := func(c chan func() (string, string)) {
-						c <- func() (string, string) {
-							return k8sSecretKey, base64.StdEncoding.EncodeToString(response.Payload.Data)
-						}
+					ch <- returnData{
+						K8sSecretKey: k8sSecretKey,
+						EncodedData:  base64.StdEncoding.EncodeToString(response.Payload.Data),
 					}
-					go returnValues(channel)
 				}
 			}(secret)
 		}
 
-		for v := range channel {
-			k8sKey, secretValue := v()
-			k8sSecrets[k8sKey] = secretValue
-		}
-		close(channel)
+		go func() {
+			wg.Wait()
+			close(ch)
+		}()
 
-		k8sSecret, err := helpers.GenerateJSONSecret(k8sSecretName, k8sSecrets)
+		for data := range ch {
+			k8sSecrets[data.K8sSecretKey] = data.EncodedData
+		}
+
+		k8sSecretJSON, err := helpers.GenerateJSONSecret(k8sSecretName, k8sSecrets)
 		if err != nil {
 			log.Fatal("JSON Helper: " + err.Error())
 		}
 
-		fmt.Println(k8sSecret)
+		fmt.Println(k8sSecretJSON)
 	},
 }
