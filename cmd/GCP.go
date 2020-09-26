@@ -9,7 +9,6 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 	"log"
-	"os"
 	"s5s/helpers"
 	"strings"
 	"sync"
@@ -27,15 +26,11 @@ var gcpCommand = &cobra.Command{
 		// K8s Flags
 		k8sSecretName, _ := cmd.Flags().GetString("output-secret")
 		k8sSecretNameError := helpers.ValidateSecretName(k8sSecretName)
-		if len(k8sSecretNameError) > 0 {
-			if k8sSecretNameError == helpers.InvalidSecretNameFormat {
-				fmt.Println("K8s secret name must be a valid format")
-				os.Exit(1)
-			} else if k8sSecretNameError == helpers.InvalidSecretNameLength {
-				fmt.Println(fmt.Sprintf(
-					"K8s secret name must be a valid length of no greater than %d characters",
-					helpers.SecretNameMaxLength))
-				os.Exit(1)
+		if k8sSecretNameError != nil {
+			if k8sSecretNameError.Error() == helpers.InvalidSecretNameFormat {
+				log.Fatal("K8s secret name must be a valid format")
+			} else if k8sSecretNameError.Error() == helpers.InvalidSecretNameLength {
+				log.Fatalf("K8s secret name must be a valid length of no greater than %d characters", helpers.SecretNameMaxLength)
 			}
 			log.Fatal(k8sSecretNameError)
 		}
@@ -123,10 +118,16 @@ func init() {
 	gcpCommand.Flags().StringP("key-file", "f", "", "GCP JSON File Credentials (this or --key is required)")
 
 	gcpCommand.Flags().StringP("project", "p", "", "GCP Project Name (required)")
-	_ = gcpCommand.MarkFlagRequired("project")
+	mustMarkFlagRequired("project")
 
 	gcpCommand.Flags().StringP("version", "v", "latest", "GCP Secret Version (default: latest)")
 
-	gcpCommand.Flags().StringArrayP("secret", "s", []string{}, "Secrets")
-	_ = gcpCommand.MarkFlagRequired("secret")
+	gcpCommand.Flags().StringArrayP("secret", "s", []string{}, "Kubernetes Secret Name")
+	mustMarkFlagRequired("secret")
+}
+
+func mustMarkFlagRequired(name string) {
+	if markRequiredError := gcpCommand.MarkFlagRequired("project"); markRequiredError != nil {
+		log.Fatal(markRequiredError)
+	}
 }

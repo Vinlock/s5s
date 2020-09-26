@@ -14,6 +14,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("output-secret", "o", "", "k8s secret name (required)")
 	_ = rootCmd.MarkPersistentFlagRequired("output-secret")
 	rootCmd.AddCommand(gcpCommand)
+	rootCmd.AddCommand(awsCommand)
 }
 
 func Execute() {

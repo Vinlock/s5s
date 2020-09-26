@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/json"
+	"errors"
 	"regexp"
 )
 
@@ -36,13 +37,13 @@ const SecretNameMaxLength int = 253
 const InvalidSecretNameFormat string = "INVALID_SECRET_NAME_FORMAT"
 const InvalidSecretNameLength string = "INVALID_SECRET_NAME_LENGTH"
 
-func ValidateSecretName(name string) string {
+func ValidateSecretName(name string) error {
 	if len(name) > SecretNameMaxLength || len(name) == 0 {
-		return InvalidSecretNameLength
+		return errors.New(InvalidSecretNameLength)
 	}
 	if !secretNameRegexFormat.MatchString(name) {
-		return InvalidSecretNameFormat
+		return errors.New(InvalidSecretNameFormat)
 	}
 
-	return ""
+	return nil
 }
