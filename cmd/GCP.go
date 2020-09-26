@@ -15,22 +15,6 @@ import (
 	"sync"
 )
 
-func init() {
-	gcpCommand.Flags().StringP("key", "k", "", "GCP JSON Credentials as string (this or --key-file is required)")
-
-	gcpCommand.Flags().StringP("key-file", "f", "", "GCP JSON File Credentials (this or --key is required)")
-
-	gcpCommand.Flags().StringP("project", "p", "", "GCP Project Name (required)")
-	_ = gcpCommand.MarkFlagRequired("project")
-
-	gcpCommand.Flags().StringP("version", "v", "latest", "GCP Secret Version (default: latest)")
-
-	gcpCommand.Flags().StringArrayP("secret", "s", []string{}, "Secrets")
-	_ = gcpCommand.MarkFlagRequired("secret")
-
-	rootCmd.AddCommand(gcpCommand)
-}
-
 type returnData struct {
 	K8sSecretKey string
 	EncodedData  string
@@ -91,6 +75,7 @@ var gcpCommand = &cobra.Command{
 			wg.Add(1)
 			go func(secret string) {
 				defer wg.Done()
+
 				secretKV := strings.Split(secret, "=")
 				if len(secretKV) != 2 {
 					log.Fatal("Secret error: Secret must be in the \"k8sKey=gcpKey\" format")
@@ -130,4 +115,18 @@ var gcpCommand = &cobra.Command{
 
 		fmt.Println(k8sSecretJSON)
 	},
+}
+
+func init() {
+	gcpCommand.Flags().StringP("key", "k", "", "GCP JSON Credentials as string (this or --key-file is required)")
+
+	gcpCommand.Flags().StringP("key-file", "f", "", "GCP JSON File Credentials (this or --key is required)")
+
+	gcpCommand.Flags().StringP("project", "p", "", "GCP Project Name (required)")
+	_ = gcpCommand.MarkFlagRequired("project")
+
+	gcpCommand.Flags().StringP("version", "v", "latest", "GCP Secret Version (default: latest)")
+
+	gcpCommand.Flags().StringArrayP("secret", "s", []string{}, "Secrets")
+	_ = gcpCommand.MarkFlagRequired("secret")
 }

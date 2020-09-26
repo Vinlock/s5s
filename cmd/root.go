@@ -13,6 +13,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.PersistentFlags().StringP("output-secret", "o", "", "k8s secret name (required)")
 	_ = rootCmd.MarkPersistentFlagRequired("output-secret")
+	rootCmd.AddCommand(gcpCommand)
 }
 
 func Execute() {
