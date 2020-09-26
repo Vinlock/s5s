@@ -3,9 +3,10 @@
 s5s is a tool to download and apply secrets from cloud Secret Managers
 
 ## Supported Secret Managers
-- [Google Cloud Secret Manager](https://github.com/Vinlock/s5s#google-cloud-secret-manager) [(link)](https://cloud.google.com/secret-manager)
+- [Google Cloud Secrets Manager](https://github.com/Vinlock/s5s#google-cloud-secrets-manager) [(link)](https://cloud.google.com/secret-manager)
+- [AWS Secrets Manager](https://github.com/Vinlock/s5s#aws-secrets-manager) [(link)](https://aws.amazon.com/secrets-manager/)
 
-### Google Cloud Secret Manager
+### Google Cloud Secrets Manager
 | Flag                    | Description                                                       | Required | Default Value |
 |-------------------------|-------------------------------------------------------------------|----------|---------------|
 | `--project \| -p`       | GCP Project Name                                                  | X        |               |
@@ -22,6 +23,25 @@ $ s5s gcp \
     -f secret.json \
     -s "mysqlusername=app-mysql-username" \
     -s "mysqlpassword=app-mysql-password" \
+    -o mysql-creds | kubectl apply --context k8s-cluster -n app-namespace -f -
+```
+
+### AWS Secrets Manager
+| Flag                    | Description                                                       | Required | Default Value         |
+|-------------------------|-------------------------------------------------------------------|----------|-----------------------|
+| `--secret \| -s`        | AWS Secret Name                                                   | X        |                       |
+| `--region \| -r`        | AWS Region Name                                                   |          | us-west-2             |
+| `--accessKeyId          | AWS Access Key ID                                                 |          | AWS_ACCESS_KEY_ID env |
+| `--accessKey            | AWS Access Key                                                    |          | AWS_ACCESS_KEY env    |
+| `--token                | AWS Access Token                                                  |          |                       |
+| `--output-secret \| -o` | Name of k8s secret                                                | X        |                       |
+
+#### Example:
+```bash
+$ s5s aws \
+    -s "project/mysql/secrets"
+    --accessKeyId AW12312312412
+    --accessKey XpijOIPUYh087^*&(^%
     -o mysql-creds | kubectl apply --context k8s-cluster -n app-namespace -f -
 ```
 
