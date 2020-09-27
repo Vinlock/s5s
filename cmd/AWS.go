@@ -65,12 +65,12 @@ var awsCommand = &cobra.Command{
 			}
 		}
 
-		awsSecretResponse := make(map[string]interface{})
-		if jsonError := json.Unmarshal([]byte(*secretValue.SecretString), &awsSecretResponse); jsonError != nil {
+		secrets := make(map[string]string)
+		if jsonError := json.Unmarshal([]byte(*secretValue.SecretString), &secrets); jsonError != nil {
 			log.Fatal(jsonError)
 		}
 
-		k8sSecretJSON, generationError := helpers.GenerateJSONSecret(k8sSecretName, awsSecretResponse["data"].(map[string]string))
+		k8sSecretJSON, generationError := helpers.GenerateJSONSecret(k8sSecretName, secrets)
 		if generationError != nil {
 			log.Fatal(generationError)
 		}
