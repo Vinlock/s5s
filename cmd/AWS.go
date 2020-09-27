@@ -70,12 +70,7 @@ var awsCommand = &cobra.Command{
 			log.Fatal(jsonError)
 		}
 
-		k8sSecrets := make(map[string]string)
-		if jsonError := json.Unmarshal([]byte(awsSecretResponse["data"].(string)), &k8sSecrets); jsonError != nil {
-			log.Fatal(jsonError)
-		}
-
-		k8sSecretJSON, generationError := helpers.GenerateJSONSecret(k8sSecretName, k8sSecrets)
+		k8sSecretJSON, generationError := helpers.GenerateJSONSecret(k8sSecretName, awsSecretResponse["data"])
 		if generationError != nil {
 			log.Fatal(generationError)
 		}
