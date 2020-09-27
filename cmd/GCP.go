@@ -3,7 +3,6 @@ package cmd
 import (
 	secretmanagerApiV1Beta1 "cloud.google.com/go/secretmanager/apiv1beta1"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/option"
@@ -15,8 +14,8 @@ import (
 )
 
 type returnData struct {
-	K8sSecretKey string
-	EncodedData  string
+	Key   string
+	Value string
 }
 
 var gcpCommand = &cobra.Command{
@@ -61,8 +60,6 @@ var gcpCommand = &cobra.Command{
 			log.Fatal("Client error: " + clientError.Error())
 		}
 
-		k8sSecrets := make(map[string]string)
-
 		ch := make(chan returnData)
 		var wg sync.WaitGroup
 
@@ -87,8 +84,8 @@ var gcpCommand = &cobra.Command{
 					log.Fatal("Response error: " + responseError.Error())
 				} else {
 					ch <- returnData{
-						K8sSecretKey: k8sSecretKey,
-						EncodedData:  base64.StdEncoding.EncodeToString(response.Payload.Data),
+						Key:   k8sSecretKey,
+						Value: string(response.Payload.Data),
 					}
 				}
 			}(secret)
@@ -99,8 +96,9 @@ var gcpCommand = &cobra.Command{
 			close(ch)
 		}()
 
+		k8sSecrets := make(map[string]string)
 		for data := range ch {
-			k8sSecrets[data.K8sSecretKey] = data.EncodedData
+			k8sSecrets[data.Key] = data.Value
 		}
 
 		k8sSecretJSON, err := helpers.GenerateJSONSecret(k8sSecretName, k8sSecrets)

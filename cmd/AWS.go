@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -69,9 +68,6 @@ var awsCommand = &cobra.Command{
 		secrets := make(map[string]string)
 		if jsonError := json.Unmarshal([]byte(*secretValue.SecretString), &secrets); jsonError != nil {
 			log.Fatal(jsonError)
-		}
-		for envKey, envValue := range secrets {
-			secrets[envKey] = base64.StdEncoding.EncodeToString([]byte(envValue))
 		}
 
 		k8sSecretJSON, generationError := helpers.GenerateJSONSecret(k8sSecretName, secrets)

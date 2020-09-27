@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"regexp"
@@ -19,9 +20,14 @@ type SecretFileMetaData struct {
 }
 
 func GenerateJSONSecret(name string, data map[string]string) (string, error) {
+	secretData := make(map[string]string)
+	for envKey, envValue := range data {
+		secretData[envKey] = base64.StdEncoding.EncodeToString([]byte(envValue))
+	}
+
 	jsonValue, jsonError := json.Marshal(SecretFile{
 		APIVersion: "v1",
-		Data:       data,
+		Data:       secretData,
 		Kind:       "Secret",
 		Metadata: SecretFileMetaData{
 			Name: name,
