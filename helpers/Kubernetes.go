@@ -18,7 +18,7 @@ type SecretFileMetaData struct {
 	Name string `json:"name"`
 }
 
-func GenerateJSONSecret(name string, data interface{}) (string, error) {
+func GenerateJSONSecret(name string, data map[string]string) (string, error) {
 	jsonValue, jsonError := json.Marshal(SecretFile{
 		APIVersion: "v1",
 		Data:       data,
