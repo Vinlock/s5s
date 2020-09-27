@@ -65,9 +65,13 @@ var awsCommand = &cobra.Command{
 			}
 		}
 
+		awsSecretResponse := make(map[string]interface{})
+		if jsonError := json.Unmarshal([]byte(*secretValue.SecretString), &awsSecretResponse); jsonError != nil {
+			log.Fatal(jsonError)
+		}
+
 		k8sSecrets := make(map[string]string)
-		jsonError := json.Unmarshal([]byte(*secretValue.SecretString), &k8sSecrets)
-		if jsonError != nil {
+		if jsonError := json.Unmarshal([]byte(awsSecretResponse["data"].(string)), &k8sSecrets); jsonError != nil {
 			log.Fatal(jsonError)
 		}
 
