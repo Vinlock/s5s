@@ -31,9 +31,9 @@ $ s5s gcp \
 |-------------------------|-------------------------------------------------------------------|----------|-----------------------|
 | `--secret \| -s`        | AWS Secret Name                                                   | X        |                       |
 | `--region \| -r`        | AWS Region Name                                                   |          | us-west-2             |
-| `--accessKeyId          | AWS Access Key ID                                                 |          | AWS_ACCESS_KEY_ID env |
-| `--accessKey            | AWS Access Key                                                    |          | AWS_ACCESS_KEY env    |
-| `--token                | AWS Access Token                                                  |          |                       |
+| `--accessKeyId`         | AWS Access Key ID                                                 |          | AWS_ACCESS_KEY_ID env |
+| `--accessKey`           | AWS Access Key                                                    |          | AWS_ACCESS_KEY env    |
+| `--token`               | AWS Access Token                                                  |          |                       |
 | `--output-secret \| -o` | Name of k8s secret                                                | X        |                       |
 
 #### Example:
